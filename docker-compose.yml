@@ -27,7 +27,7 @@ services:
       - event-store
       - media-manager
   py-processor:
-    image: phuisuite/py-processor
+    image: phisuite/py-processor
   event-handler:
     image: phisuite/handler
     depends_on:
