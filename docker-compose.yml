@@ -1,0 +1,63 @@
+version: '3'
+services:
+  zoo:
+    image: 'zookeeper:3.4'
+  event-store:
+    image: ches/kafka
+    environment:
+      - ZOOKEEPER_IP=zoo
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+    volumes:
+      - './data/events:/data'
+    depends_on:
+      - zoo
+  data-store:
+    image: mongo
+    volumes:
+      - './data/entities:/data/db'
+    ports:
+      - '27017:27017'
+  media-manager:
+    image: phisuite/media
+    volumes:
+      - './data/media:/data/media'
+  event-publisher:
+    image: phisuite/publisher
+    depends_on:
+      - event-store
+      - media-manager
+  py-processor:
+    image: phuisuite/py-processor
+  event-handler:
+    image: phisuite/handler
+    depends_on:
+      - event-store
+      - data-store
+      - py-processor
+  entity-inspector:
+    image: phisuite/inspector
+    depends_on:
+      - data-store
+  reporter:
+    image: phisuite/reporter
+    depends_on:
+      - data-store
+  administration:
+    image: phisuite/admin
+    depends_on:
+      - data-store
+  proxy-api:
+    image: phisuite/proxy
+    environment:
+      - ISSUER=https://vvf.eu.auth0.com/
+      - AUDIENCE=http://test.victornitu.com:8080
+      - JWKS_URI=https://vvf.eu.auth0.com/.well-known/jwks.json
+    ports:
+      - '8080:80'
+    depends_on:
+      - media-manager
+      - event-publisher
+      - entity-inspector
+      - py-processor
+      - reporter
+      - administration
