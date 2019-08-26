@@ -7,16 +7,12 @@ services:
     environment:
       - ZOOKEEPER_IP=zoo
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
-    volumes:
-      - './data/events:/data'
     depends_on:
       - zoo
   data-store:
     image: mongo
     volumes:
       - './data/entities:/data/db'
-    ports:
-      - '27017:27017'
   media-manager:
     image: phisuite/media
     volumes:
@@ -26,14 +22,14 @@ services:
     depends_on:
       - event-store
       - media-manager
-  py-processor:
-    image: phisuite/py-processor
+  processor:
+    image: phisuite/processor
   event-handler:
     image: phisuite/handler
     depends_on:
       - event-store
       - data-store
-      - py-processor
+      - processor
   entity-inspector:
     image: phisuite/inspector
     depends_on:
@@ -53,11 +49,11 @@ services:
       - AUDIENCE=http://test.victornitu.com:8080
       - JWKS_URI=https://vvf.eu.auth0.com/.well-known/jwks.json
     ports:
-      - '8080:80'
+      - '443:443'
     depends_on:
       - media-manager
       - event-publisher
       - entity-inspector
-      - py-processor
+      - processor
       - reporter
       - administration
