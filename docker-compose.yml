@@ -1,7 +1,7 @@
 version: '3'
 services:
   zoo:
-    image: 'zookeeper:3.4'
+    image: zookeeper:3.4
   event-store:
     image: ches/kafka
     environment:
@@ -12,11 +12,11 @@ services:
   data-store:
     image: mongo
     volumes:
-      - './data/entities:/data/db'
+      - ./data/entities:/data/db
   media-manager:
     image: phisuite/media
     volumes:
-      - './data/media:/data/media'
+      - ./data/media:/data/media
   event-publisher:
     image: phisuite/publisher
     depends_on:
@@ -48,8 +48,6 @@ services:
       - ISSUER=https://vvf.eu.auth0.com/
       - AUDIENCE=http://test.victornitu.com:8080
       - JWKS_URI=https://vvf.eu.auth0.com/.well-known/jwks.json
-    ports:
-      - '443:443'
     depends_on:
       - media-manager
       - event-publisher
@@ -57,3 +55,15 @@ services:
       - processor
       - reporter
       - administration
+  webserver:
+    image: nginx:latest
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./conf/certbot-etc:/etc/letsencrypt
+      - ./conf/certbot-var:/var/lib/letsencrypt
+      - ./conf/dhparam:/etc/ssl/certs
+    depends_on:
+      - proxy-api

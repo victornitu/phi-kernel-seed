@@ -1,6 +1,6 @@
-DOMAIN ?= domain.phikernel.com
+DOMAIN ?= example.com
+EMAIL ?= contact@example.com
 TARGET ?= proxy-api
-EMAIL ?= info@vvfluxembourg.com
 
 start:
 	docker-compose up -d
@@ -15,8 +15,13 @@ stop:
 list: 
 	docker-compose ps
 logs: 
-	docker-compose logs -f $TARGET
+	docker-compose logs -f ${TARGET}
 clean:
-	rm -rf ./data/*
+	rm -rf ./data/* ./conf/*
 cert:
-    docker run -it -v ./config:/etc/letsencrypt/live/$DOMAIN certbot/certbot certonly --standalone -n -m $MAIL --agree-tos --force-renewal -d $DOMAIN
+	mkdir -p conf/certbot-etc conf/certbot-var conf/dhparam
+	openssl dhparam -out ./conf/dhparam/dhparam-2048.pem 2048
+	docker run -it \
+	-v ./conf/certbot-etc:/etc/letsencrypt  \
+	-v ./conf/certbot-var:/var/lib/letsencrypt  \
+	certbot/certbot certonly --standalone -n -m ${MAIL} --agree-tos --no-eff-email --force-renewal -d ${DOMAIN}
