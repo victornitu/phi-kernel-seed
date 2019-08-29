@@ -17,7 +17,7 @@ list:
 logs: 
 	docker-compose logs -f ${TARGET}
 clean:
-	rm -rf ./data/* ./conf/*
+	rm -rf ./data/*
 cert:
 	mkdir -p conf/certbot-etc conf/certbot-var conf/dhparam
 	openssl dhparam -out ./conf/dhparam/dhparam-2048.pem 2048

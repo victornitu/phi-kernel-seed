@@ -34,6 +34,11 @@ services:
     image: phisuite/inspector
     depends_on:
       - data-store
+  learner:
+    image: phisuite/learner
+    depends_on:
+      - data-store
+      - entity-inspector
   reporter:
     image: phisuite/reporter
     depends_on:
@@ -42,6 +47,15 @@ services:
     image: phisuite/admin
     depends_on:
       - data-store
+      - event-publisher
+      - entity-inspector
+      - processor
+      - learner
+  migrator:
+    image: phisuite/migrator
+    depends_on:
+      - administration
+      - event-publisher
   proxy-api:
     image: phisuite/proxy
     environment:
@@ -53,8 +67,10 @@ services:
       - event-publisher
       - entity-inspector
       - processor
+      - learner
       - reporter
       - administration
+      - migrator
   webserver:
     image: nginx:latest
     ports:
