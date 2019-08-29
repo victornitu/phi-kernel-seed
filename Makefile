@@ -1,5 +1,5 @@
-DOMAIN ?= example.com
-EMAIL ?= contact@example.com
+DOMAIN ?= print.phikernel.com
+EMAIL ?= info@vvfluxembourg.com
 TARGET ?= proxy-api
 
 start:
